@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f7">
+<title>App Web 0.2 Arsa</title>
+<style>
+:root{
+  /* Palet dasar dibuat netral sementara karena kode warna dashboard 0.1 belum terdokumentasi.
+     Ganti token ini setelah warna asli dikonfirmasi; warna semantik dipertahankan. */
+  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eef0f3; --ink:#20242b;
+  --muted:#737b87; --line:#dfe3e8; --accent:#343b49; --accent-soft:#e8ebef;
+  --green:#16834a; --green-soft:#e4f4ea; --red:#c63e3e; --red-soft:#fae9e9;
+  --amber:#d18a13; --yellow:#e7c52c; --radius:17px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:760px;margin:0 auto;min-height:100dvh;padding-bottom:88px}
+header{padding:24px 18px 14px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.version{font-size:11px;color:var(--muted);margin-top:2px}
+main{padding:0 16px}
+.page{display:none}.page.active{display:block}
+h1{font-size:23px;line-height:1.2;margin:8px 0 18px;letter-spacing:-.5px}
+h2{font-size:17px;margin:0 0 13px}
+h3{font-size:14px;margin:0 0 10px}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:0 0 13px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.section-head h2,.section-head h3{margin:0}
+.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stack{display:grid;gap:10px}
+.progress{height:9px;background:var(--surface-2);border-radius:20px;overflow:hidden;flex:1}
+.progress>span{display:block;height:100%;border-radius:20px;background:var(--accent);width:0}
+.progress-line{display:flex;align-items:center;gap:10px;margin:7px 0 5px}
+.count{font-size:12px;color:var(--muted);white-space:nowrap}
+.amount{font-weight:750;font-variant-numeric:tabular-nums}
+.income{color:var(--green)}.expense{color:var(--red)}
+label{display:block;font-size:12px;font-weight:650;color:var(--muted);margin:0 0 6px}
+input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;background:#fff;padding:11px 12px;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:#7b8491;box-shadow:0 0 0 3px rgba(70,80,95,.10)}
+textarea{resize:vertical;min-height:76px}
+.field{margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:11px;background:var(--accent);color:#fff;padding:11px 14px;font-weight:700}
+.btn.secondary{background:var(--surface-2);color:var(--ink)}
+.btn.done{background:#dfe8df;color:#17251a}
+.btn.danger{background:var(--red-soft);color:var(--red)}
+.btn.icon{width:36px;height:36px;padding:0;font-size:22px;line-height:1;border-radius:50%}
+.btn.full{width:100%}
+.nav{position:fixed;z-index:5;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
+.nav button{border:0;background:transparent;color:var(--muted);padding:7px 1px;border-radius:10px;font-size:10px;font-weight:650;display:grid;justify-items:center;gap:4px}
+.nav button span{font-size:18px;line-height:1.1}
+.nav button.active{background:var(--accent-soft);color:var(--ink)}
+.metric{padding:12px;background:var(--surface-2);border-radius:12px}
+.metric strong{display:block;font-size:18px;margin-top:3px}
+hr{border:0;border-top:1px solid var(--line);margin:13px 0}
+.list-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0;padding-bottom:0}
+.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.weekday{text-align:center;color:var(--muted);font-size:11px;padding:4px 0}
+.day{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;position:relative}
+.day.empty{visibility:hidden}.day.selected{outline:2px solid var(--accent);background:#e6e9ee}
+.day .dot{width:6px;height:6px;border-radius:50%;background:transparent}
+.day.c1 .dot{background:#d94343}.day.c2 .dot{background:#d58a13}.day.c3 .dot{background:#e3c32a}.day.c4 .dot{background:#299b57}
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.legend span{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.swatch{width:9px;height:9px;border-radius:3px;display:inline-block}
+.checkrow{display:flex;align-items:center;gap:9px;margin:9px 0}
+.checkrow input{width:18px;height:18px;accent-color:var(--accent)}
+.checkrow label{margin:0;color:var(--ink);font-size:14px}
+.subform{padding:13px 0;border-bottom:1px solid var(--line)}
+.subform:last-child{border-bottom:0}
+.chart-wrap{width:100%;overflow:hidden}
+svg.chart{width:100%;height:190px;display:block}
+.chart-label{font-size:10px;fill:var(--muted)}
+.asset-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.asset-row:last-child{border:0}
+.asset-code{font-weight:800;min-width:42px}
+.asset-name{font-size:12px;color:var(--muted);flex:1}
+.asset-value{font-size:13px;font-weight:700;text-align:right}
+.asset-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.donut{width:180px;height:180px;border-radius:50%;margin:8px auto 18px;position:relative;display:grid;place-items:center}
+.donut:after{content:"";position:absolute;width:112px;height:112px;border-radius:50%;background:var(--surface)}
+.donut-center{z-index:1;text-align:center}
+.donut-center strong{display:block;font-size:18px}
+.alloc-row{margin:10px 0}
+.alloc-meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:5px}
+.archive-link{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.archive-link:last-child{border:0}
+.archive-icon{width:36px;height:36px;border-radius:11px;background:var(--surface-2);display:grid;place-items:center;font-size:17px}
+.archive-link .desc{font-size:11px;color:var(--muted)}
+.empty{padding:20px 8px;text-align:center;color:var(--muted);font-size:13px}
+.pill{font-size:10px;border-radius:30px;padding:4px 8px;background:var(--surface-2);color:var(--muted)}
+.notice{font-size:11px;color:var(--muted);padding:10px 12px;background:var(--surface-2);border-radius:10px;margin-bottom:12px}
+.hidden{display:none!important}
+@media(min-width:600px){main{padding:0 22px}header{padding-left:24px;padding-right:24px}.section{padding:19px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">ARSA</div><div class="version">App Web 0.2 · Personal Dashboard</div></div><span class="pill" id="todayLabel"></span></header>
+<main>
+<section class="page active" id="page-home">
+<h1>Beranda</h1>
+<div class="section">
+  <div class="section-head"><h2>Rutinitas</h2><span class="count" id="homeRoutineCount">0/4 selesai</span></div>
+  <div class="progress"><span id="homeRoutineBar"></span></div>
+</div>
+<div class="section">
+  <div class="section-head"><h2>Target Clipping</h2><span class="count" id="homeClipCount">0/0 selesai</span></div>
+  <div class="progress"><span id="homeClipBar"></span></div>
+</div>
+<div class="section">
+  <h2>Keuangan</h2><div class="small muted" style="margin:8px 0 4px">Pemasukan · hari ini</div>
+  <div class="progress-line"><div class="progress"><span id="homeIncomeBar" style="background:var(--green)"></span></div><strong class="amount income" id="homeIncome">+ Rp0</strong></div>
+  <div class="small muted" style="margin:12px 0 4px">Pengeluaran · hari ini</div>
+  <div class="progress-line"><div class="progress"><span id="homeExpenseBar" style="background:var(--red)"></span></div><strong class="amount expense" id="homeExpense">− Rp0</strong></div>
+  <div class="tiny muted">Ringkasan harian sementara untuk prototipe.</div>
+</div>
+</section>
+
+<section class="page" id="page-routine">
+<h1>Rutinitas</h1>
+<div class="section">
+  <div class="section-head"><h2>Aktivitas Harian</h2><input type="date" id="routineDate" style="width:auto;padding:7px;font-size:12px"></div>
+  <div class="subform">
+    <div class="checkrow"><input type="checkbox" id="runDone"><label for="runDone">Lari</label></div>
+    <div class="grid2"><div><label for="runType">Jenis aktivitas</label><select id="runType"><option>Berlari</option><option>Berjalan</option></select></div><div><label for="runKm">Jarak (KM)</label><input id="runKm" type="number" min="0" step="0.1" placeholder="0.0"></div></div>
+  </div>
+  <div class="subform">
+    <div class="checkrow"><input type="checkbox" id="workDone"><label for="workDone">Workout</label></div>
+    <div class="field"><label for="workCount">Jumlah gerakan</label><input id="workCount" type="number" min="0" step="1" placeholder="0"></div>
+  </div>
+  <div class="subform">
+    <div class="checkrow"><input type="checkbox" id="routineClipDone"><label for="routineClipDone">Clipping</label></div>
+    <div class="field"><label for="routineClipCount">Jumlah clip</label><input id="routineClipCount" type="number" min="0" step="1" placeholder="0"></div>
+  </div>
+  <div class="subform">
+    <div class="checkrow"><input type="checkbox" id="studyDone"><label for="studyDone">Belajar investasi/keuangan</label></div>
+    <div class="field"><label for="studyNote">Catatan</label><textarea id="studyNote" placeholder="Catatan belajar (opsional)"></textarea></div>
+  </div>
+  <button class="btn full" id="saveRoutine">Simpan Rutinitas</button>
+</div>
+<div class="section">
+  <div class="calendar-head"><button class="btn secondary icon" id="prevMonth">‹</button><strong id="monthTitle"></strong><button class="btn secondary icon" id="nextMonth">›</button></div>
+  <div class="calendar" id="calendarGrid"></div>
+  <div class="legend">
+    <span><i class="swatch" style="background:#d94343"></i>1 aktivitas</span>
+    <span><i class="swatch" style="background:#d58a13"></i>2 aktivitas</span>
+    <span><i class="swatch" style="background:#e3c32a"></i>3 aktivitas</span>
+    <span><i class="swatch" style="background:#299b57"></i>4 aktivitas</span>
+  </div>
+</div>
+<div class="section"><h2 id="selectedDateTitle">Detail Aktivitas</h2><div id="selectedRoutineDetail" class="empty">Pilih tanggal untuk melihat aktivitas.</div></div>
+</section>
+
+<section class="page" id="page-clipping">
+<h1>Clipping</h1>
+<div class="section">
+  <h2>TARGET CLIPPING</h2>
+  <div class="grid2">
+    <div class="field"><label for="targetDate">Tanggal</label><input id="targetDate" type="date"></div>
+    <div class="field"><label for="clipTarget">Target</label><input id="clipTarget" type="number" min="1" step="1" value="10"></div>
+  </div>
+  <div class="field"><label for="clipActual">Clip Selesai</label><input id="clipActual" type="number" min="0" step="1" value="0"></div>
+  <div class="row"><span class="small muted">Progress</span><strong class="count" id="clipProgressText">0/10 selesai</strong></div>
+  <div class="progress" style="margin:8px 0 12px"><span id="clipProgressBar"></span></div>
+  <div class="grid2"><div class="metric"><span class="small muted">Tercapai</span><strong id="clipAchieved">0</strong></div><div class="metric"><span class="small muted">Tambahan</span><strong id="clipExtra">0</strong></div></div>
+  <hr><h3>POST</h3>
+  <div class="grid2">
+    <div class="field"><label for="postTikTok">TikTok</label><input id="postTikTok" type="number" min="0" value="0"></div>
+    <div class="field"><label for="postInstagram">Instagram</label><input id="postInstagram" type="number" min="0" value="0"></div>
+    <div class="field"><label for="postYoutube">YouTube Shorts</label><input id="postYoutube" type="number" min="0" value="0"></div>
+  </div>
+  <button class="btn full" id="saveTarget">Simpan Target Harian</button>
+</div>
+<div class="section">
+  <div class="section-head"><h2>CAMPAIGN CLIPPING</h2><button class="btn icon" id="addCampaign" aria-label="Tambah campaign">+</button></div>
+  <div id="campaignList"></div>
+</div>
+</section>
+
+<section class="page" id="page-money">
+<h1>Keuangan</h1>
+<div class="section">
+  <div class="grid2" style="margin-bottom:12px">
+    <button class="btn" id="expenseMode">Pengeluaran</button><button class="btn secondary" id="incomeMode">Pemasukan</button>
+  </div>
+  <div class="field"><label for="moneyAmount">Nominal (Rupiah)</label><input id="moneyAmount" type="number" min="1" placeholder="Contoh: 25000"></div>
+  <div class="grid2">
+    <div class="field"><label for="moneyDate">Tanggal</label><input id="moneyDate" type="date"></div>
+    <div class="field"><label for="moneyCategory">Kategori</label><input id="moneyCategory" placeholder="Tulis kategori"></div>
+  </div>
+  <div class="field"><label for="moneyNote">Catatan (opsional)</label><textarea id="moneyNote" placeholder="Catatan transaksi"></textarea></div>
+  <button class="btn full" id="saveMoney">Simpan Transaksi</button>
+</div>
+<div class="section">
+  <div class="section-head"><h2>Grafik Keuangan</h2><select id="chartMode" style="width:auto"><option value="month">Bulanan</option><option value="year">Tahunan</option></select></div>
+  <div class="grid2"><div class="field"><label for="chartMonth">Bulan</label><input id="chartMonth" type="month"></div><div class="field"><label for="chartYear">Tahun</label><input id="chartYear" type="number" min="2000" max="2100"></div></div>
+  <div class="chart-wrap"><svg class="chart" id="moneyChart" viewBox="0 0 340 190" role="img" aria-label="Grafik pemasukan dan pengeluaran"></svg></div>
+  <div class="grid2">
+    <div class="metric"><span class="small income">Pemasukan</span><strong class="income" id="periodIncome">Rp0</strong></div>
+    <div class="metric"><span class="small expense">Pengeluaran</span><strong class="expense" id="periodExpense">Rp0</strong></div>
+  </div>
+  <div class="metric" style="margin-top:9px"><span class="small muted">Total bersih</span><strong id="periodNet">Rp0</strong></div>
+</div>
+<div class="section"><h2>Riwayat Transaksi</h2><div id="transactionHistory"></div></div>
+</section>
+
+<section class="page" id="page-invest">
+<h1>Investasi</h1>
+<div class="section">
+  <div class="section-head"><h2>INVESTASI ALLOCATION</h2><button class="btn icon" id="addAsset">+</button></div>
+  <div id="assetList" class="empty">Belum ada aset investasi.</div>
+  <div id="assetForm" class="hidden">
+    <hr><div class="field"><label for="assetName">Nama Aset</label><input id="assetName" placeholder="Contoh: Bitcoin"></div>
+    <div class="field"><label for="assetCode">Kode</label><input id="assetCode" placeholder="Contoh: BTC"></div>
+    <div class="field"><label for="assetAmount">Jumlah Nominal (Rp)</label><input id="assetAmount" type="number" min="1" placeholder="Nominal investasi"></div>
+    <button class="btn full" id="saveAsset">Simpan Aset</button>
+  </div>
+</div>
+<div class="section">
+  <h2>Portfolio Allocation</h2>
+  <div id="donut" class="donut"><div class="donut-center"><strong id="investTotal">Rp0</strong><span class="tiny muted" id="assetCount">0 aset</span></div></div>
+  <div id="allocationList" class="empty">Alokasi akan muncul setelah aset ditambahkan.</div>
+</div>
+</section>
+
+<section class="page" id="page-data">
+<h1>Data</h1>
+<div class="section" id="dataMenu">
+  <div class="archive-link" data-archive="campaign"><div class="archive-icon">▤</div><div style="flex:1"><strong>Campaign Clipping</strong><div class="desc">Campaign yang sudah selesai</div></div><span>›</span></div>
+  <div class="archive-link" data-archive="target"><div class="archive-icon">◎</div><div style="flex:1"><strong>Target Clipping</strong><div class="desc">Riwayat target harian</div></div><span>›</span></div>
+  <div class="archive-link" data-archive="routine"><div class="archive-icon">✓</div><div style="flex:1"><strong>Rutinitas</strong><div class="desc">Riwayat aktivitas harian</div></div><span>›</span></div>
+  <div class="archive-link" data-archive="money"><div class="archive-icon">Rp</div><div style="flex:1"><strong>Keuangan</strong><div class="desc">Riwayat harian dan ringkasan bulanan</div></div><span>›</span></div>
+</div>
+<div class="section hidden" id="archiveView"><div class="section-head"><button class="btn secondary" id="backData">‹ Kembali</button><h2 id="archiveTitle"></h2></div><div id="archiveContent"></div></div>
+</section>
+</main>
+<nav class="nav">
+<button class="active" data-page="home"><span>⌂</span>Beranda</button>
+<button data-page="routine"><span>✓</span>Rutinitas</button>
+<button data-page="clipping"><span>▣</span>Clipping</button>
+<button data-page="money"><span>Rp</span>Keuangan</button>
+<button data-page="invest"><span>◉</span>Investasi</button>
+<button data-page="data"><span>▤</span>Data</button>
+</nav>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString('en-CA');
+const money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
+const read=()=>{try{return JSON.parse(localStorage.getItem('arsa02')||'{}')}catch{return {}}};
+let db=Object.assign({routines:{},targets:{},campaigns:[],transactions:[],assets:[]},read());
+let moneyType='expense',calendarMonth=new Date(),selectedRoutineDate=today();
+function save(){localStorage.setItem('arsa02',JSON.stringify(db));renderAll()}
+function dateLabel(s){return new Date(s+'T12:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function nav(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));window.scrollTo(0,0);if(page==='routine')renderCalendar();if(page==='money')renderMoney();if(page==='invest')renderInvest();if(page==='data'){ $('dataMenu').classList.remove('hidden');$('archiveView').classList.add('hidden')}}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>nav(b.dataset.page));
+$('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+$('routineDate').value=today();$('targetDate').value=today();$('moneyDate').value=today();$('chartMonth').value=today().slice(0,7);$('chartYear').value=new Date().getFullYear();
+function routineFormLoad(){let r=db.routines[$('routineDate').value]||{};$('runDone').checked=!!r.runDone;$('runType').value=r.runType||'Berlari';$('runKm').value=r.runKm||'';$('workDone').checked=!!r.workDone;$('workCount').value=r.workCount||'';$('routineClipDone').checked=!!r.clipDone;$('routineClipCount').value=r.clipCount||'';$('studyDone').checked=!!r.studyDone;$('studyNote').value=r.studyNote||''}
+$('routineDate').onchange=()=>{selectedRoutineDate=$('routineDate').value;routineFormLoad();renderCalendar()};
+$('saveRoutine').onclick=()=>{let d=$('routineDate').value;db.routines[d]={runDone:$('runDone').checked,runType:$('runType').value,runKm:$('runKm').value,workDone:$('workDone').checked,workCount:$('workCount').value,clipDone:$('routineClipDone').checked,clipCount:$('routineClipCount').value,studyDone:$('studyDone').checked,studyNote:$('studyNote').value};selectedRoutineDate=d;save();renderCalendar();};
+function routineCount(r){return r?['runDone','workDone','clipDone','studyDone'].filter(k=>r[k]).length:0}
+function renderCalendar(){
+ let y=calendarMonth.getFullYear(),m=calendarMonth.getMonth();$('monthTitle').textContent=calendarMonth.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+ let first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate(),out=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<div class="weekday">${x}</div>`).join('');
+ for(let i=0;i<first;i++)out+='<div class="day empty"></div>';
+ for(let d=1;d<=days;d++){let key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,c=routineCount(db.routines[key]);out+=`<button class="day ${c?'c'+c:''} ${key===selectedRoutineDate?'selected':''}" data-date="${key}">${d}<i class="dot"></i></button>`}
+ $('calendarGrid').innerHTML=out;
+ $('calendarGrid').querySelectorAll('[data-date]').forEach(b=>b.onclick=()=>{selectedRoutineDate=b.dataset.date;$('routineDate').value=selectedRoutineDate;routineFormLoad();renderCalendar();renderSelectedRoutine()});
+ renderSelectedRoutine();
+}
+function renderSelectedRoutine(){let r=db.routines[selectedRoutineDate]||{};$('selectedDateTitle').textContent=dateLabel(selectedRoutineDate);let items=[['Lari',r.runDone,`${r.runType||'Berlari'} · ${r.runKm||0} KM`],['Workout',r.workDone,`${r.workCount||0} gerakan`],['Clipping',r.clipDone,`${r.clipCount||0} clip`],['Belajar investasi/keuangan',r.studyDone,r.studyNote||'Tidak ada catatan']];$('selectedRoutineDetail').innerHTML=items.map(([n,ok,desc])=>`<div class="row list-item"><div><strong>${n}</strong><div class="small muted">${safe(desc)}</div></div><span class="pill">${ok?'Selesai':'Belum'}</span></div>`).join('')}
+$('prevMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar()};$('nextMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar()};
+function targetLoad(){let d=$('targetDate').value,t=db.targets[d]||{target:10,actual:0,tiktok:0,instagram:0,youtube:0};$('clipTarget').value=t.target??10;$('clipActual').value=t.actual??0;$('postTikTok').value=t.tiktok||0;$('postInstagram').value=t.instagram||0;$('postYoutube').value=t.youtube||0;updateTargetPreview()}
+function updateTargetPreview(){let t=Math.max(1,+$('clipTarget').value||1),a=Math.max(0,+$('clipActual').value||0);$('clipProgressText').textContent=`${Math.min(a,t)}/${t} selesai`;$('clipProgressBar').style.width=Math.min(100,a/t*100)+'%';$('clipAchieved').textContent=a;$('clipExtra').textContent=Math.max(0,a-t)}
+['clipTarget','clipActual'].forEach(id=>$(id).oninput=updateTargetPreview);$('targetDate').onchange=targetLoad;
+$('saveTarget').onclick=()=>{let d=$('targetDate').value;db.targets[d]={target:Math.max(1,+$('clipTarget').value||1),actual:Math.max(0,+$('clipActual').value||0),tiktok:+$('postTikTok').value||0,instagram:+$('postInstagram').value||0,youtube:+$('postYoutube').value||0};save()};
+function renderCampaigns(){let el=$('campaignList');if(!db.campaigns.length){el.innerHTML='<div class="empty">Belum ada campaign aktif. Tekan + untuk menambahkan.</div>';return}el.innerHTML=db.campaigns.map((c,i)=>`<div class="subform"><div class="field"><label>Campaign</label><input data-c="${i}" data-k="name" value="${safe(c.name||'')}" placeholder="Nama campaign"></div><div class="field"><label>Video Dibuat</label><input type="number" min="0" data-c="${i}" data-k="created" value="${c.created||0}"></div><label>Video Dipost</label><div class="grid2"><div class="field"><label>TikTok</label><input type="number" min="0" data-c="${i}" data-k="tiktok" value="${c.tiktok||0}"></div><div class="field"><label>Instagram</label><input type="number" min="0" data-c="${i}" data-k="instagram" value="${c.instagram||0}"></div><div class="field"><label>YouTube Shorts</label><input type="number" min="0" data-c="${i}" data-k="youtube" value="${c.youtube||0}"></div><div class="field"><label>Pendapatan (Rp)</label><input type="number" min="0" data-c="${i}" data-k="income" value="${c.income||''}"></div></div><button class="btn done full" data-finish="${i}">Selesai</button></div>`).join('');el.querySelectorAll('[data-c]').forEach(inp=>inp.onchange=()=>{let c=db.campaigns[+inp.dataset.c];c[inp.dataset.k]=inp.type==='number'?+inp.value:inp.value;localStorage.setItem('arsa02',JSON.stringify(db))});el.querySelectorAll('[data-finish]').forEach(b=>b.onclick=()=>{let c=db.campaigns.splice(+b.dataset.finish,1)[0];db.archivedCampaigns=db.archivedCampaigns||[];db.archivedCampaigns.push({...c,completedAt:today()});save()})}
+$('addCampaign').onclick=()=>{db.campaigns.push({name:'',created:0,tiktok:0,instagram:0,youtube:0,income:0});save()};
+$('expenseMode').onclick=()=>setMoneyMode('expense');$('incomeMode').onclick=()=>setMoneyMode('income');
+function setMoneyMode(t){moneyType=t;$('expenseMode').className=t==='expense'?'btn':'btn secondary';$('incomeMode').className=t==='income'?'btn':'btn secondary'}
+$('saveMoney').onclick=()=>{let amount=+$('moneyAmount').value;if(!amount||amount<1||!$('moneyDate').value||!$('moneyCategory').value.trim()){alert('Isi nominal, tanggal, dan kategori terlebih dahulu.');return}db.transactions.push({id:Date.now(),type:moneyType,amount,date:$('moneyDate').value,category:$('moneyCategory').value.trim(),note:$('moneyNote').value,createdAt:new Date().toISOString()});$('moneyAmount').value='';$('moneyCategory').value='';$('moneyNote').value='';save()};
+$('chartMode').onchange=renderMoney;$('chartMonth').onchange=renderMoney;$('chartYear').onchange=renderMoney;
+function renderMoney(){
+ let mode=$('chartMode').value,labels=[],inc=[],exp=[],tx=db.transactions;
+ if(mode==='month'){let ym=$('chartMonth').value;let [y,m]=ym.split('-').map(Number),days=new Date(y,m,0).getDate();for(let d=1;d<=days;d++){let k=String(d).padStart(2,'0');labels.push(k);inc.push(0);exp.push(0)}tx=tx.filter(t=>t.date.startsWith(ym));tx.forEach(t=>{let i=+t.date.slice(-2)-1;(t.type==='income'?inc:exp)[i]+=t.amount})}
+ else{let y=+$('chartYear').value;labels=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];inc=Array(12).fill(0);exp=Array(12).fill(0);tx=tx.filter(t=>t.date.startsWith(String(y)));tx.forEach(t=>{let i=+t.date.slice(5,7)-1;(t.type==='income'?inc:exp)[i]+=t.amount})}
+ $('periodIncome').textContent=money(inc.reduce((a,b)=>a+b,0));$('periodExpense').textContent=money(exp.reduce((a,b)=>a+b,0));$('periodNet').textContent=money(inc.reduce((a,b)=>a+b,0)-exp.reduce((a,b)=>a+b,0));
+ let max=Math.max(1,...inc,...exp),w=340,h=190,left=30,right=8,top=12,bottom=25,plotW=w-left-right,plotH=h-top-bottom;
+ const pts=arr=>arr.map((v,i)=>`${left+(i/(arr.length-1||1))*plotW},${top+plotH-(v/max)*plotH}`).join(' ');
+ let xTicks=labels.length>15?[0,Math.floor((labels.length-1)/2),labels.length-1]:labels.map((_,i)=>i);
+ let xText=xTicks.map(i=>`<text class="chart-label" x="${left+(i/(labels.length-1||1))*plotW}" y="${h-6}" text-anchor="middle">${labels[i]}</text>`).join('');
+ let grid=[0,.5,1].map(p=>{let y=top+plotH-p*plotH;return `<line x1="${left}" y1="${y}" x2="${w-right}" y2="${y}" stroke="#e4e7eb"/><text class="chart-label" x="${left-5}" y="${y+3}" text-anchor="end">${Math.round(max*p/1000)}k</text>`}).join('');
+ $('moneyChart').innerHTML=grid+`<polyline points="${pts(inc)}" fill="none" stroke="#16834a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pts(exp)}" fill="none" stroke="#c63e3e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`+xText;
+ let sorted=[...db.transactions].sort((a,b)=>b.createdAt.localeCompare(a.createdAt));$('transactionHistory').innerHTML=sorted.length?sorted.map(t=>`<div class="list-item"><div class="row"><strong>${t.type==='income'?'Pemasukan':'Pengeluaran'} · ${safe(t.category)}</strong><strong class="amount ${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'} ${money(t.amount)}</strong></div><div class="small muted">${dateLabel(t.date)}${t.date===today()?' · '+new Date(t.createdAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>${t.note?`<div class="small muted">${safe(t.note)}</div>`:''}</div>`).join(''):'<div class="empty">Hari ini belum ada transaksi pemasukan maupun pengeluaran.</div>';
+}
+const colors=['#e99b27','#2879c7','#7754c8','#23834d','#c63e3e','#16a6a1','#a35b9b','#87933a','#5d6878'];
+function renderInvest(){let total=db.assets.reduce((a,b)=>a+b.amount,0);$('investTotal').textContent=money(total);$('assetCount').textContent=db.assets.length+' aset';$('assetList').innerHTML=db.assets.length?db.assets.map(a=>`<div class="asset-row"><i class="asset-dot" style="background:${a.color}"></i><strong class="asset-code">${safe(a.code)}</strong><span class="asset-name">(${safe(a.name)})</span><strong class="asset-value">${money(a.amount)}</strong></div>`).join(''):'<div class="empty">Belum ada aset investasi.</div>';let start=0,stops=[];db.assets.forEach(a=>{let end=start+(total?a.amount/total*100:0);stops.push(`${a.color} ${start}% ${end}%`);start=end});$('donut').style.background=stops.length?`conic-gradient(${stops.join(',')})`:'var(--surface-2)';$('allocationList').innerHTML=db.assets.length?db.assets.map(a=>{let p=total?a.amount/total*100:0;return `<div class="alloc-row"><div class="alloc-meta"><span><i class="asset-dot" style="display:inline-block;background:${a.color};margin-right:6px"></i><strong>${safe(a.code)}</strong> · ${safe(a.name)}</span><span>${p.toFixed(1)}% · ${money(a.amount)}</span></div><div class="progress"><span style="width:${p}%;background:${a.color}"></span></div></div>`}).join(''):'<div class="empty">Alokasi akan muncul setelah aset ditambahkan.</div>'}
+$('addAsset').onclick=()=>$('assetForm').classList.toggle('hidden');
+$('saveAsset').onclick=()=>{let name=$('assetName').value.trim(),code=$('assetCode').value.trim().toUpperCase(),amount=+$('assetAmount').value;if(!name||!code||amount<=0){alert('Lengkapi nama, kode, dan nominal aset.');return}let existing=db.assets.find(a=>a.code.toLowerCase()===code.toLowerCase());if(existing){existing.amount+=amount}else{db.assets.push({name,code,amount,color:colors[db.assets.length%colors.length]})}$('assetName').value='';$('assetCode').value='';$('assetAmount').value='';$('assetForm').classList.add('hidden');save()};
+function renderHome(){let r=db.routines[today()],rc=routineCount(r),t=db.targets[today()]||{target:0,actual:0};$('homeRoutineCount').textContent=rc+'/4 selesai';$('homeRoutineBar').style.width=(rc/4*100)+'%';$('homeClipCount').textContent=Math.min(t.actual,t.target)+'/'+t.target+' selesai';$('homeClipBar').style.width=(t.target?Math.min(100,t.actual/t.target*100):0)+'%';let tx=db.transactions.filter(x=>x.date===today()),i=tx.filter(x=>x.type==='income').reduce((a,b)=>a+b.amount,0),e=tx.filter(x=>x.type==='expense').reduce((a,b)=>a+b.amount,0),max=Math.max(i,e,1);$('homeIncome').textContent='+ '+money(i);$('homeExpense').textContent='− '+money(e);$('homeIncomeBar').style.width=(i/max*100)+'%';$('homeExpenseBar').style.width=(e/max*100)+'%'}
+function renderArchives(type){$('dataMenu').classList.add('hidden');$('archiveView').classList.remove('hidden');let names={campaign:'Campaign Clipping',target:'Target Clipping',routine:'Rutinitas',money:'Keuangan'};$('archiveTitle').textContent=names[type];let items=[];
+ if(type==='campaign')items=(db.archivedCampaigns||[]).map(c=>`<div class="list-item"><strong>${safe(c.name||'Campaign')}</strong><div class="small muted">Selesai: ${dateLabel(c.completedAt)}</div><div class="small">Video dibuat ${c.created||0} · TikTok ${c.tiktok||0} · Instagram ${c.instagram||0} · YouTube ${c.youtube||0}</div><div class="small amount income">Pendapatan ${money(c.income)}</div></div>`);
+ if(type==='target')items=Object.entries(db.targets).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,t])=>`<div class="list-item"><strong>${dateLabel(d)}</strong><div class="small muted">Target ${t.target} · Selesai ${t.actual} · Tambahan ${Math.max(0,t.actual-t.target)}</div><div class="small">Posting: TikTok ${t.tiktok||0} · Instagram ${t.instagram||0} · YouTube ${t.youtube||0}</div></div>`);
+ if(type==='routine')items=Object.entries(db.routines).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,r])=>`<div class="list-item"><strong>${dateLabel(d)} · ${routineCount(r)}/4</strong><div class="small muted">Lari: ${r.runDone?'Selesai':'Belum'} (${r.runType||'—'}, ${r.runKm||0} KM) · Workout: ${r.workDone?'Selesai':'Belum'} (${r.workCount||0}) · Clipping: ${r.clipDone?'Selesai':'Belum'} (${r.clipCount||0}) · Belajar: ${r.studyDone?'Selesai':'Belum'}</div></div>`);
+ if(type==='money'){items=db.transactions.slice().sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(t=>`<div class="list-item"><strong class="${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'} ${money(t.amount)}</strong><div class="small muted">${safe(t.category)} · ${dateLabel(t.date)}</div>${t.note?`<div class="small">${safe(t.note)}</div>`:''}</div>`)}
+ $('archiveContent').innerHTML=items.length?items.join(''):'<div class="empty">Belum ada data tersimpan.</div>'}
+document.querySelectorAll('[data-archive]').forEach(b=>b.onclick=()=>renderArchives(b.dataset.archive));$('backData').onclick=()=>{$('archiveView').classList.add('hidden');$('dataMenu').classList.remove('hidden')};
+function renderAll(){renderHome();renderCampaigns();renderMoney();renderInvest();if($('page-routine').classList.contains('active'))renderCalendar()}
+function init(){routineFormLoad();targetLoad();renderAll();renderCalendar();setMoneyMode('expense')}
+init();
+</script>
+</body>
+</html>
