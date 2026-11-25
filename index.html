@@ -188,17 +188,17 @@ svg.chart{width:100%;height:190px;display:block}
 
 <section class="page" id="page-money">
 <h1>Keuangan</h1>
+<div class="money-month-head"><button class="btn secondary icon" id="moneyPrevMonth">‹</button><div><div class="money-month-title" id="moneyMonthTitle">November</div><div class="muted" id="moneyYearTitle">2026</div></div><button class="btn secondary icon" id="moneyNextMonth">›</button></div>
+<div class="section money-summary"><div class="small muted">Selisih bulan ini</div><div class="money-summary-net" id="moneyMonthNet">Rp 0</div><div class="money-summary-pair"><div><span class="small muted">Pemasukan</span><strong class="income" id="moneyMonthIncome">Rp 0</strong></div><div><span class="small muted">Pengeluaran</span><strong class="expense" id="moneyMonthExpense">Rp 0</strong></div></div></div>
 <div class="section">
-  <div class="money-month-head"><button class="btn secondary icon" id="moneyPrevMonth">‹</button><div><div class="money-month-title" id="moneyMonthTitle">November</div><div class="muted" id="moneyYearTitle">2026</div></div><button class="btn secondary icon" id="moneyNextMonth">›</button></div>
-  <div class="money-summary"><div class="small muted">Selisih bulan ini</div><div class="money-summary-net" id="moneyMonthNet">Rp 0</div><div class="money-summary-pair"><div><span class="small muted">Pemasukan</span><strong class="income" id="moneyMonthIncome">Rp 0</strong></div><div><span class="small muted">Pengeluaran</span><strong class="expense" id="moneyMonthExpense">Rp 0</strong></div></div></div>
   <div class="grid2" style="margin-bottom:12px"><button class="btn money-mode-active" id="expenseMode">Pengeluaran</button><button class="btn secondary" id="incomeMode">Pemasukan</button></div>
-  <div class="field"><label for="moneyAmount">Nominal (Rupiah)</label><input id="moneyAmount" type="number" min="1" placeholder="Contoh: 25000"></div>
   <div class="grid2">
+    <div class="field"><label for="moneyAmount">Jumlah (Rp)</label><input id="moneyAmount" type="number" min="1" placeholder="Contoh: 25000"></div>
     <div class="field"><label for="moneyDate">Tanggal</label><input id="moneyDate" type="date"></div>
-    <div class="field"><label for="moneyCategory">Kategori</label><input id="moneyCategory" placeholder="Tulis kategori"></div>
+    <div class="field"><label for="moneyCategory">Kategori</label><input id="moneyCategory" placeholder="Kategori"></div>
+    <div class="field"><label for="moneyNote">Catatan (opsional)</label><input id="moneyNote" placeholder="Catatan (opsional)"></div>
   </div>
-  <div class="field"><label for="moneyNote">Catatan (opsional)</label><textarea id="moneyNote" placeholder="Catatan transaksi"></textarea></div>
-  <button class="btn full" id="saveMoney">Simpan Transaksi</button>
+  <button class="btn full money-mode-active" id="saveMoney">Simpan transaksi</button>
 </div>
 <div class="section">
   <div class="section-head"><h2>Grafik Keuangan</h2><select id="chartMode" style="width:auto"><option value="month">Bulanan</option><option value="year">Tahunan</option></select></div>
