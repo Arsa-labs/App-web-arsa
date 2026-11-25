@@ -82,7 +82,7 @@ svg.chart{width:100%;height:190px;display:block}
 .asset-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
 .asset-row:last-child{border:0}
 .asset-code{font-weight:800;min-width:42px}
-.asset-name{font-size:12px;color:var(--muted);flex:1}
+.asset-name{font-size:12px;color:var(--muted);flex:0 1 auto;margin-right:auto}
 .asset-value{font-size:13px;font-weight:700;text-align:right}
 .asset-dot{width:10px;height:10px;border-radius:50%;flex:none}
 .donut{width:180px;height:180px;border-radius:50%;margin:8px auto 18px;position:relative;display:grid;place-items:center}
@@ -283,8 +283,9 @@ function renderSelectedRoutine(){let r=db.routines[selectedRoutineDate]||{};$('s
 $('prevMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar()};$('nextMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar()};
 function targetLoad(){let d=$('targetDate').value,t=db.targets[d]||{target:10,actual:0,tiktok:0,instagram:0,youtube:0};$('clipTarget').value=t.target??10;$('clipActual').value=t.actual??0;$('postTikTok').value=t.tiktok||0;$('postInstagram').value=t.instagram||0;$('postYoutube').value=t.youtube||0;updateTargetPreview()}
 function updateTargetPreview(){let t=Math.max(1,+$('clipTarget').value||1),a=Math.max(0,+$('clipActual').value||0);$('clipProgressText').textContent=`${Math.min(a,t)}/${t} selesai`;$('clipProgressBar').style.width=Math.min(100,a/t*100)+'%';$('clipAchieved').textContent=a;$('clipExtra').textContent=Math.max(0,a-t)}
-['clipTarget','clipActual'].forEach(id=>$(id).oninput=updateTargetPreview);$('targetDate').onchange=targetLoad;
-$('saveTarget').onclick=()=>{let d=$('targetDate').value;db.targets[d]={target:Math.max(1,+$('clipTarget').value||1),actual:Math.max(0,+$('clipActual').value||0),tiktok:+$('postTikTok').value||0,instagram:+$('postInstagram').value||0,youtube:+$('postYoutube').value||0};save()};
+function saveTargetDraft(){let d=$('targetDate').value;if(!d)return;db.targets[d]={target:Math.max(1,+$('clipTarget').value||1),actual:Math.max(0,+$('clipActual').value||0),tiktok:+$('postTikTok').value||0,instagram:+$('postInstagram').value||0,youtube:+$('postYoutube').value||0};localStorage.setItem('arsa02',JSON.stringify(db));renderHome()}
+['clipTarget','clipActual','postTikTok','postInstagram','postYoutube'].forEach(id=>$(id).oninput=()=>{updateTargetPreview();saveTargetDraft()});$('targetDate').onchange=targetLoad;
+$('saveTarget').onclick=()=>{saveTargetDraft();renderAll()};
 function renderCampaigns(){let el=$('campaignList');if(!db.campaigns.length){el.innerHTML='<div class="empty">Belum ada campaign aktif. Tekan + untuk menambahkan.</div>';return}el.innerHTML=db.campaigns.map((c,i)=>`<div class="subform"><div class="field"><label>Campaign</label><input data-c="${i}" data-k="name" value="${safe(c.name||'')}" placeholder="Nama campaign"></div><div class="field"><label>Video Dibuat</label><input type="number" min="0" data-c="${i}" data-k="created" value="${c.created||0}"></div><label>Video Dipost</label><div class="grid2"><div class="field"><label>TikTok</label><input type="number" min="0" data-c="${i}" data-k="tiktok" value="${c.tiktok||0}"></div><div class="field"><label>Instagram</label><input type="number" min="0" data-c="${i}" data-k="instagram" value="${c.instagram||0}"></div><div class="field"><label>YouTube Shorts</label><input type="number" min="0" data-c="${i}" data-k="youtube" value="${c.youtube||0}"></div><div class="field"><label>Pendapatan (Rp)</label><input type="number" min="0" data-c="${i}" data-k="income" value="${c.income||''}"></div></div><button class="btn done full" data-finish="${i}">Selesai</button></div>`).join('');el.querySelectorAll('[data-c]').forEach(inp=>inp.onchange=()=>{let c=db.campaigns[+inp.dataset.c];c[inp.dataset.k]=inp.type==='number'?+inp.value:inp.value;localStorage.setItem('arsa02',JSON.stringify(db))});el.querySelectorAll('[data-finish]').forEach(b=>b.onclick=()=>{let c=db.campaigns.splice(+b.dataset.finish,1)[0];db.archivedCampaigns=db.archivedCampaigns||[];db.archivedCampaigns.push({...c,completedAt:today()});save()})}
 $('addCampaign').onclick=()=>{db.campaigns.push({name:'',created:0,tiktok:0,instagram:0,youtube:0,income:0});save()};
 $('expenseMode').onclick=()=>setMoneyMode('expense');$('incomeMode').onclick=()=>setMoneyMode('income');
@@ -293,14 +294,17 @@ $('saveMoney').onclick=()=>{let amount=+$('moneyAmount').value;if(!amount||amoun
 $('chartMode').onchange=renderMoney;$('chartMonth').onchange=renderMoney;$('chartYear').onchange=renderMoney;
 function renderMoney(){
  let mode=$('chartMode').value,labels=[],inc=[],exp=[],tx=db.transactions;
+ let monthKey=$('chartMonth').value||today().slice(0,7),[sumY,sumM]=monthKey.split('-').map(Number),monthTx=db.transactions.filter(t=>t.date.startsWith(monthKey));
+ let sumIn=monthTx.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0),sumOut=monthTx.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0);
+ $('moneyMonthTitle').textContent=new Date(sumY,sumM-1,1).toLocaleDateString('id-ID',{month:'long'});$('moneyYearTitle').textContent=String(sumY);$('moneyMonthIncome').textContent=money(sumIn);$('moneyMonthExpense').textContent=money(sumOut);$('moneyMonthNet').textContent=money(sumIn-sumOut);
  if(mode==='month'){let ym=$('chartMonth').value;let [y,m]=ym.split('-').map(Number),days=new Date(y,m,0).getDate();for(let d=1;d<=days;d++){let k=String(d).padStart(2,'0');labels.push(k);inc.push(0);exp.push(0)}tx=tx.filter(t=>t.date.startsWith(ym));tx.forEach(t=>{let i=+t.date.slice(-2)-1;(t.type==='income'?inc:exp)[i]+=t.amount})}
  else{let y=+$('chartYear').value;labels=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];inc=Array(12).fill(0);exp=Array(12).fill(0);tx=tx.filter(t=>t.date.startsWith(String(y)));tx.forEach(t=>{let i=+t.date.slice(5,7)-1;(t.type==='income'?inc:exp)[i]+=t.amount})}
  $('periodIncome').textContent=money(inc.reduce((a,b)=>a+b,0));$('periodExpense').textContent=money(exp.reduce((a,b)=>a+b,0));$('periodNet').textContent=money(inc.reduce((a,b)=>a+b,0)-exp.reduce((a,b)=>a+b,0));
  let max=Math.max(1,...inc,...exp),w=340,h=190,left=30,right=8,top=12,bottom=25,plotW=w-left-right,plotH=h-top-bottom;
  const pts=arr=>arr.map((v,i)=>`${left+(i/(arr.length-1||1))*plotW},${top+plotH-(v/max)*plotH}`).join(' ');
- let xTicks=labels.length>15?[0,Math.floor((labels.length-1)/2),labels.length-1]:labels.map((_,i)=>i);
+ let xTicks=mode==='month'?[0,4,9,14,19,24,labels.length-1]:labels.map((_,i)=>i);
  let xText=xTicks.map(i=>`<text class="chart-label" x="${left+(i/(labels.length-1||1))*plotW}" y="${h-6}" text-anchor="middle">${labels[i]}</text>`).join('');
- let grid=[0,.5,1].map(p=>{let y=top+plotH-p*plotH;return `<line x1="${left}" y1="${y}" x2="${w-right}" y2="${y}" stroke="#e4e7eb"/><text class="chart-label" x="${left-5}" y="${y+3}" text-anchor="end">${Math.round(max*p/1000)}k</text>`}).join('');
+ let grid=[0,.5,1].map(p=>{let y=top+plotH-p*plotH;return `<line x1="${left}" y1="${y}" x2="${w-right}" y2="${y}" stroke="var(--line)"/><text class="chart-label" x="${left-5}" y="${y+3}" text-anchor="end">${money(max*p)}</text>`}).join('');
  $('moneyChart').innerHTML=grid+`<polyline points="${pts(inc)}" fill="none" stroke="#16834a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pts(exp)}" fill="none" stroke="#c63e3e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`+xText;
  let sorted=[...db.transactions].sort((a,b)=>b.createdAt.localeCompare(a.createdAt));$('transactionHistory').innerHTML=sorted.length?sorted.map(t=>`<div class="list-item"><div class="row"><strong>${t.type==='income'?'Pemasukan':'Pengeluaran'} · ${safe(t.category)}</strong><strong class="amount ${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'} ${money(t.amount)}</strong></div><div class="small muted">${dateLabel(t.date)}${t.date===today()?' · '+new Date(t.createdAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>${t.note?`<div class="small muted">${safe(t.note)}</div>`:''}</div>`).join(''):'<div class="empty">Hari ini belum ada transaksi pemasukan maupun pengeluaran.</div>';
 }
@@ -317,7 +321,8 @@ function renderArchives(type){$('dataMenu').classList.add('hidden');$('archiveVi
  $('archiveContent').innerHTML=items.length?items.join(''):'<div class="empty">Belum ada data tersimpan.</div>'}
 document.querySelectorAll('[data-archive]').forEach(b=>b.onclick=()=>renderArchives(b.dataset.archive));$('backData').onclick=()=>{$('archiveView').classList.add('hidden');$('dataMenu').classList.remove('hidden')};
 function renderAll(){renderHome();renderCampaigns();renderMoney();renderInvest();if($('page-routine').classList.contains('active'))renderCalendar()}
-function init(){routineFormLoad();targetLoad();renderAll();renderCalendar();setMoneyMode('expense')}
+function refreshWIBDay(){const d=today();$('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',timeZone:'Asia/Jakarta'});if($('targetDate').value!==d){$('targetDate').value=d;targetLoad()}if($('routineDate').value!==d){$('routineDate').value=d;selectedRoutineDate=d;routineFormLoad();renderCalendar()}renderHome()}
+function init(){routineFormLoad();targetLoad();renderAll();renderCalendar();setMoneyMode('expense');refreshWIBDay();setInterval(refreshWIBDay,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWIBDay()})}
 init();
 </script>
 </body>
