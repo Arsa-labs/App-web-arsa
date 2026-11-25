@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f4f5f7">
+<meta name="theme-color" content="#101216">
 <title>App Web 0.2 Arsa</title>
 <style>
 :root{
   /* Palet dasar dibuat netral sementara karena kode warna dashboard 0.1 belum terdokumentasi.
      Ganti token ini setelah warna asli dikonfirmasi; warna semantik dipertahankan. */
-  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eef0f3; --ink:#20242b;
-  --muted:#737b87; --line:#dfe3e8; --accent:#343b49; --accent-soft:#e8ebef;
-  --green:#16834a; --green-soft:#e4f4ea; --red:#c63e3e; --red-soft:#fae9e9;
+  --bg:#101216; --surface:#191b1f; --surface-2:#202329; --ink:#eef0f4;
+  --muted:#969ba5; --line:#2b3038; --accent:#b4e484; --accent-soft:#252d25;
+  --green:#42c99a; --green-soft:#18352e; --red:#ef8177; --red-soft:#3a2425;
   --amber:#d18a13; --yellow:#e7c52c; --radius:17px;
 }
 *{box-sizing:border-box}
@@ -28,6 +28,7 @@ h1{font-size:23px;line-height:1.2;margin:8px 0 18px;letter-spacing:-.5px}
 h2{font-size:17px;margin:0 0 13px}
 h3{font-size:14px;margin:0 0 10px}
 .section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:0 0 13px}
+.money-summary{background:#1a202c;border:1px solid #2b3442;border-radius:18px;padding:20px;margin:0 0 14px}.money-month-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.money-month-title{font-size:25px;font-weight:800}.money-summary-net{font-size:34px;font-weight:850;margin:4px 0 12px}.money-summary-pair{display:flex;gap:28px}.money-summary-pair strong{display:block;font-size:17px;margin-top:2px}.money-mode-active{background:#718ff5!important;color:#111827!important}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
 .section-head h2,.section-head h3{margin:0}
 .muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}
@@ -40,7 +41,7 @@ h3{font-size:14px;margin:0 0 10px}
 .amount{font-weight:750;font-variant-numeric:tabular-nums}
 .income{color:var(--green)}.expense{color:var(--red)}
 label{display:block;font-size:12px;font-weight:650;color:var(--muted);margin:0 0 6px}
-input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;background:#fff;padding:11px 12px;color:var(--ink);outline:none}
+input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;background:#10171d;padding:13px 14px;color:var(--ink);outline:none}
 input:focus,select:focus,textarea:focus{border-color:#7b8491;box-shadow:0 0 0 3px rgba(70,80,95,.10)}
 textarea{resize:vertical;min-height:76px}
 .field{margin-bottom:12px}
@@ -51,7 +52,7 @@ textarea{resize:vertical;min-height:76px}
 .btn.danger{background:var(--red-soft);color:var(--red)}
 .btn.icon{width:36px;height:36px;padding:0;font-size:22px;line-height:1;border-radius:50%}
 .btn.full{width:100%}
-.nav{position:fixed;z-index:5;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
+.nav{position:fixed;z-index:5;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(16,18,22,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
 .nav button{border:0;background:transparent;color:var(--muted);padding:7px 1px;border-radius:10px;font-size:10px;font-weight:650;display:grid;justify-items:center;gap:4px}
 .nav button span{font-size:18px;line-height:1.1}
 .nav button.active{background:var(--accent-soft);color:var(--ink)}
@@ -64,9 +65,9 @@ hr{border:0;border-top:1px solid var(--line);margin:13px 0}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .weekday{text-align:center;color:var(--muted);font-size:11px;padding:4px 0}
 .day{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;position:relative}
-.day.empty{visibility:hidden}.day.selected{outline:2px solid var(--accent);background:#e6e9ee}
-.day .dot{width:6px;height:6px;border-radius:50%;background:transparent}
-.day.c1 .dot{background:#d94343}.day.c2 .dot{background:#d58a13}.day.c3 .dot{background:#e3c32a}.day.c4 .dot{background:#299b57}
+.day.empty{visibility:hidden}.day.selected{outline:2px solid #eef0f4;outline-offset:-3px}
+.day .dot{display:none}
+.day.c1{background:#d94343;color:#fff;border-color:#d94343}.day.c2{background:#d58a13;color:#fff;border-color:#d58a13}.day.c3{background:#e3c32a;color:#20242b;border-color:#e3c32a}.day.c4{background:#299b57;color:#fff;border-color:#299b57}
 .legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
 .legend span{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
 .swatch{width:9px;height:9px;border-radius:3px;display:inline-block}
@@ -188,9 +189,9 @@ svg.chart{width:100%;height:190px;display:block}
 <section class="page" id="page-money">
 <h1>Keuangan</h1>
 <div class="section">
-  <div class="grid2" style="margin-bottom:12px">
-    <button class="btn" id="expenseMode">Pengeluaran</button><button class="btn secondary" id="incomeMode">Pemasukan</button>
-  </div>
+  <div class="money-month-head"><button class="btn secondary icon" id="moneyPrevMonth">‹</button><div><div class="money-month-title" id="moneyMonthTitle">November</div><div class="muted" id="moneyYearTitle">2026</div></div><button class="btn secondary icon" id="moneyNextMonth">›</button></div>
+  <div class="money-summary"><div class="small muted">Selisih bulan ini</div><div class="money-summary-net" id="moneyMonthNet">Rp 0</div><div class="money-summary-pair"><div><span class="small muted">Pemasukan</span><strong class="income" id="moneyMonthIncome">Rp 0</strong></div><div><span class="small muted">Pengeluaran</span><strong class="expense" id="moneyMonthExpense">Rp 0</strong></div></div></div>
+  <div class="grid2" style="margin-bottom:12px"><button class="btn money-mode-active" id="expenseMode">Pengeluaran</button><button class="btn secondary" id="incomeMode">Pemasukan</button></div>
   <div class="field"><label for="moneyAmount">Nominal (Rupiah)</label><input id="moneyAmount" type="number" min="1" placeholder="Contoh: 25000"></div>
   <div class="grid2">
     <div class="field"><label for="moneyDate">Tanggal</label><input id="moneyDate" type="date"></div>
@@ -253,8 +254,8 @@ svg.chart{width:100%;height:190px;display:block}
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const today=()=>new Date().toLocaleDateString('en-CA');
-const money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const money=n=>'Rp '+Math.round(Number(n)||0).toLocaleString('id-ID');
 const read=()=>{try{return JSON.parse(localStorage.getItem('arsa02')||'{}')}catch{return {}}};
 let db=Object.assign({routines:{},targets:{},campaigns:[],transactions:[],assets:[]},read());
 let moneyType='expense',calendarMonth=new Date(),selectedRoutineDate=today();
@@ -287,7 +288,7 @@ $('saveTarget').onclick=()=>{let d=$('targetDate').value;db.targets[d]={target:M
 function renderCampaigns(){let el=$('campaignList');if(!db.campaigns.length){el.innerHTML='<div class="empty">Belum ada campaign aktif. Tekan + untuk menambahkan.</div>';return}el.innerHTML=db.campaigns.map((c,i)=>`<div class="subform"><div class="field"><label>Campaign</label><input data-c="${i}" data-k="name" value="${safe(c.name||'')}" placeholder="Nama campaign"></div><div class="field"><label>Video Dibuat</label><input type="number" min="0" data-c="${i}" data-k="created" value="${c.created||0}"></div><label>Video Dipost</label><div class="grid2"><div class="field"><label>TikTok</label><input type="number" min="0" data-c="${i}" data-k="tiktok" value="${c.tiktok||0}"></div><div class="field"><label>Instagram</label><input type="number" min="0" data-c="${i}" data-k="instagram" value="${c.instagram||0}"></div><div class="field"><label>YouTube Shorts</label><input type="number" min="0" data-c="${i}" data-k="youtube" value="${c.youtube||0}"></div><div class="field"><label>Pendapatan (Rp)</label><input type="number" min="0" data-c="${i}" data-k="income" value="${c.income||''}"></div></div><button class="btn done full" data-finish="${i}">Selesai</button></div>`).join('');el.querySelectorAll('[data-c]').forEach(inp=>inp.onchange=()=>{let c=db.campaigns[+inp.dataset.c];c[inp.dataset.k]=inp.type==='number'?+inp.value:inp.value;localStorage.setItem('arsa02',JSON.stringify(db))});el.querySelectorAll('[data-finish]').forEach(b=>b.onclick=()=>{let c=db.campaigns.splice(+b.dataset.finish,1)[0];db.archivedCampaigns=db.archivedCampaigns||[];db.archivedCampaigns.push({...c,completedAt:today()});save()})}
 $('addCampaign').onclick=()=>{db.campaigns.push({name:'',created:0,tiktok:0,instagram:0,youtube:0,income:0});save()};
 $('expenseMode').onclick=()=>setMoneyMode('expense');$('incomeMode').onclick=()=>setMoneyMode('income');
-function setMoneyMode(t){moneyType=t;$('expenseMode').className=t==='expense'?'btn':'btn secondary';$('incomeMode').className=t==='income'?'btn':'btn secondary'}
+function setMoneyMode(t){moneyType=t;$('expenseMode').className=t==='expense'?'btn money-mode-active':'btn secondary';$('incomeMode').className=t==='income'?'btn money-mode-active':'btn secondary'}
 $('saveMoney').onclick=()=>{let amount=+$('moneyAmount').value;if(!amount||amount<1||!$('moneyDate').value||!$('moneyCategory').value.trim()){alert('Isi nominal, tanggal, dan kategori terlebih dahulu.');return}db.transactions.push({id:Date.now(),type:moneyType,amount,date:$('moneyDate').value,category:$('moneyCategory').value.trim(),note:$('moneyNote').value,createdAt:new Date().toISOString()});$('moneyAmount').value='';$('moneyCategory').value='';$('moneyNote').value='';save()};
 $('chartMode').onchange=renderMoney;$('chartMonth').onchange=renderMoney;$('chartYear').onchange=renderMoney;
 function renderMoney(){
